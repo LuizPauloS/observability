@@ -17,7 +17,6 @@
             <sortByTime>true</sortByTime>
         </format>
     </appender>
-
     <root level="INFO">
         <appender-ref ref="LOKI"/>
     </root>
