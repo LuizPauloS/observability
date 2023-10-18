@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.1.4'
 	id 'io.spring.dependency-management' version '1.1.3'
+	id 'jacoco'
+	id 'org.sonarqube' version '4.2.1.3168'
 }
 
 group = 'br.com.lsilva.portfolio'
@@ -21,7 +23,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave:1.1.5'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	// implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.0.4'
 	implementation 'io.zipkin.reporter2:zipkin-reporter-brave:2.16.4'
 	implementation 'com.github.loki4j:loki-logback-appender:1.4.1'
 	implementation 'io.micrometer:micrometer-registry-prometheus'
@@ -29,6 +30,52 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+jacoco {
+    toolVersion = "0.8.9"
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+}
+
+sonar {
+  properties {
+	property 'sonar.java.coveragePlugin', 'jacoco'
+    property 'sonar.projectKey', 'observability'
+    property 'sonar.projectName', 'observability'
+	property 'sonar.token', 'sqp_1dea1189416ed1174fe59fd8ce0aeb2c9d700618'
+	property 'sonar.jacoco.reportPath', '${buildPath}/test-reports/jacoco.exec'
+  }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+ 				counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.5
+            }
+        }
+
+        rule {
+            enabled = true
+            element = 'CLASS'
+            includes = ['br.com.lsilva.portfolio.observability.*']
+
+            limit {
+                counter = 'LINE'
+                value = 'TOTALCOUNT'
+                maximum = 0.3
+            }
+        }
+    }
 }

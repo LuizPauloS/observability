@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +34,7 @@ public class UsersResources {
         return ResponseEntity.ok(service.addUser(userDTO));
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/{id}")
     public  ResponseEntity<UserDTO> findByUUID(@PathVariable Integer id) throws Exception {
         return ResponseEntity.ok(service.findByUUID(id));
     }
@@ -41,5 +42,10 @@ public class UsersResources {
     @GetMapping
     public ResponseEntity<List<UserDTO>> listAll() {
         return ResponseEntity.ok(service.listAll());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> deleteUser(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.deleteUser(id));
     }
 }

@@ -3,6 +3,7 @@ package br.com.lsilva.portfolio.observability.services;
 import java.net.URI;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.slf4j.Logger;
@@ -20,16 +21,20 @@ public class UsersServices {
     private RestTemplate client;
     private UserRepository repository;
 
-    public UsersServices(RestTemplate client, UserRepository repository) {
+    @Value("${mocky.io.url}")
+    private final String uriMock;
+
+    public UsersServices(RestTemplate client, UserRepository repository, String uriMock) {
         this.client = client;
         this.repository = repository;
+        this.uriMock = uriMock;
     }
 
     public UserDTO addUser(UserDTO userDTO) {
         if (userDTO != null) {
             log.info("Adicionando user {} na base de dados.", userDTO.getNome());
             repository.save(new User(userDTO.getNome(), userDTO.getDocumento()));
-            log.info("Call mocky.io {}", client.getForEntity(URI.create("https://run.mocky.io/v3/63b3b5f4-0d95-4693-8e27-34277df7d9e7"), Object.class));
+            log.info("Call mocky.io {}", client.getForEntity(URI.create(uriMock), Object.class));
             return userDTO;
         }
         log.error("Erro ao criar novo usuario {}...", userDTO.getNome());
@@ -43,6 +48,10 @@ public class UsersServices {
     public UserDTO findByUUID(Integer id) throws Exception {
         return repository.findById(id).map(user -> new UserDTO(user.getNome(), user.getDocumento()))
             .orElseThrow(() -> new RuntimeException("Usuário não encontrado..."));
+    }
+
+    public Boolean deleteUser(Integer id) {
+        return Boolean.TRUE;
     }
     
 }
