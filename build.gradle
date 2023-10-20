@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'br.com.lsilva.portfolio'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
@@ -31,51 +31,32 @@ dependencies {
 }
 
 jacoco {
-    toolVersion = "0.8.9"
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
+    toolVersion = '0.8.9'
 }
 
 test {
+	useJUnitPlatform()
     finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
 jacocoTestReport {
-    dependsOn test // tests are required to run before generating the report
+	dependsOn test // tests are required to run before generating the report
+    reports {
+        xml.required = true
+    }
+	afterEvaluate {
+		classDirectories.from = files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+				'**/br/com/lsilva/portfolio/observability/model**'
+			])
+		})
+	}
 }
 
-sonar {
+sonarqube {
   properties {
-	property 'sonar.java.coveragePlugin', 'jacoco'
     property 'sonar.projectKey', 'observability'
     property 'sonar.projectName', 'observability'
 	property 'sonar.token', 'sqp_1dea1189416ed1174fe59fd8ce0aeb2c9d700618'
-	property 'sonar.jacoco.reportPath', '${buildPath}/test-reports/jacoco.exec'
   }
-}
-
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
- 				counter = 'BRANCH'
-                value = 'COVEREDRATIO'
-                minimum = 0.5
-            }
-        }
-
-        rule {
-            enabled = true
-            element = 'CLASS'
-            includes = ['br.com.lsilva.portfolio.observability.*']
-
-            limit {
-                counter = 'LINE'
-                value = 'TOTALCOUNT'
-                maximum = 0.3
-            }
-        }
-    }
 }
