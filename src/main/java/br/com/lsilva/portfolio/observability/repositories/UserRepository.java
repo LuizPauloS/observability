@@ -1,4 +1,4 @@
-package br.com.lsilva.portfolio.observability.repository;
+package br.com.lsilva.portfolio.observability.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

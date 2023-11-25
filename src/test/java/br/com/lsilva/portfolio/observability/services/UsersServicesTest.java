@@ -1,27 +1,29 @@
 package br.com.lsilva.portfolio.observability.services;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Assertions;
+import br.com.lsilva.portfolio.observability.client.MockyClient;
+import br.com.lsilva.portfolio.observability.mock.UserMock;
+import br.com.lsilva.portfolio.observability.model.dto.UserDTO;
+import br.com.lsilva.portfolio.observability.model.entity.User;
+import br.com.lsilva.portfolio.observability.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
-import br.com.lsilva.portfolio.observability.model.dto.UserDTO;
-import br.com.lsilva.portfolio.observability.model.entity.User;
-import br.com.lsilva.portfolio.observability.repository.UserRepository;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class UsersServicesTest {
 
     RestTemplate client;
+    MockyClient mockyClient;
     UsersServices service;
     UserRepository repository;
     final String uriMockTest = "https://run.mocky.io/v3/63b3b5f4-0d95-4693-8e27-34277df7d9e7";
@@ -29,44 +31,53 @@ class UsersServicesTest {
     @BeforeEach
     void setUp() {
         this.client = mock(RestTemplate.class);
+        this.mockyClient = mock(MockyClient.class);
         this.repository = mock(UserRepository.class);
-        this.service = new UsersServices(client, repository, uriMockTest);
+        this.service = new UsersServices(client, mockyClient, repository, uriMockTest);
     }
 
     @Test
     void dadoUserDTO_quandoChamarAddUser_deveSalvarComSucesso() {
-        User user = new User("Joao", "123.456.789-10");
-        UserDTO userDTO = new UserDTO(user.getNome(), user.getDocumento());
+         UserDTO userDTO = UserMock.getNewUserDTOMock();
+         User user = UserMock.getUserMock(userDTO.getNome(), userDTO.getDocumento());
 
-        when(repository.save(any())).thenReturn(user);
-        UserDTO newUserDTO = service.addUser(userDTO);
+         when(repository.save(any())).thenReturn(user);
+         UserDTO userResponse = service.addUser(userDTO);
 
-        Assertions.assertNotNull(newUserDTO);
-        Assertions.assertEquals(userDTO.getNome(), newUserDTO.getNome());
-        Assertions.assertEquals(userDTO.getDocumento(), newUserDTO.getDocumento());
+         assertNotNull(userResponse);
+         assertEquals(userDTO.getNome(), userResponse.getNome());
+         assertEquals(userDTO.getDocumento(), userResponse.getDocumento());
     }
 
     @Test
     void quandoChamarListAll_deveRetornarListaComSucesso() {
-        User user1 = new User("Carol", "222.456.789-10");
-        User user2 = new User("Maria", "333.456.789-10");
-        User user3 = new User("Lucas", "444.456.789-10");
+        List<User> userLists = UserMock.getListUserMock();
 
-        when(repository.findAll()).thenReturn(List.of(user1, user2, user3));
-        List<UserDTO> listUserDTOs = service.listAll();
+        when(repository.findAll()).thenReturn(userLists);
+        List<UserDTO> listUserResponse = service.listAll();
 
-        Assertions.assertNotNull(listUserDTOs);
-        Assertions.assertFalse(listUserDTOs.isEmpty());
+        assertNotNull(listUserResponse);
+        assertFalse(listUserResponse.isEmpty());
+        assertEquals(listUserResponse.size(), userLists.size());
     }
 
     @Test
-    void quandoChamarFindByUUID_deveRetornarUserComSucesso() throws Exception {
-        User user = new User("Carol", "222.456.789-10");
+    void quandoChamarFindByUUID_deveRetornarUserComSucesso() {
+        User user = UserMock.getNewUserMock();
 
         when(repository.findById(1)).thenReturn(Optional.of(user));
-        UserDTO userDTO = service.findByUUID(1);
+        UserDTO userResponse = service.findByUUID(1);
 
-        Assertions.assertNotNull(userDTO);
+        assertNotNull(userResponse);
+    }
+
+    @Test
+    void quandoChamarDeleteUser_deveDeletarERetornarSucesso() {
+
+        when(repository.existsById(1)).thenReturn(Boolean.TRUE);
+        Boolean userDeleted = service.deleteUser(1);
+
+        assertTrue(userDeleted);
     }
 
 }
