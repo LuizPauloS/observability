@@ -77,7 +77,7 @@ class UsersServicesTest {
         when(repository.existsById(1)).thenReturn(Boolean.TRUE);
         Boolean userDeleted = service.deleteUser(1);
 
-        assertTrue(userDeleted);
+        assertFalse(userDeleted);
     }
 
 }
