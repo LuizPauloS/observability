@@ -1,6 +1,5 @@
 package br.com.lsilva.portfolio.observability.resources;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.MediaType;
@@ -36,12 +35,12 @@ public class UsersResources {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> saveUser(@RequestBody @Validated UserDTO userDTO) throws IOException {
+    public ResponseEntity<UserDTO> saveUser(@RequestBody @Validated UserDTO userDTO) {
         return ResponseEntity.ok(service.addUser(userDTO));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public  ResponseEntity<UserDTO> findByUUID(@PathVariable Integer id) throws Exception {
+    public  ResponseEntity<UserDTO> findByUUID(@PathVariable Integer id) {
         return ResponseEntity.ok(service.findByUUID(id));
     }
 

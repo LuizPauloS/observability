@@ -32,7 +32,7 @@ public class UsersServices {
     }
 
     public UserDTO addUser(UserDTO userDTO) {
-        log.info("Adicionando user {} na base de dados.", userDTO.getNome());
+        log.info("Adicionando novo usuário na base de dados.");
         User userResponse = repository.save(new User(userDTO.getNome(), userDTO.getDocumento()));
         return Optional.of(userResponse).map(user -> new UserDTO(userDTO.getNome(), user.getDocumento()))
             .orElseThrow(() -> {
