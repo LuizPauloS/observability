@@ -9,9 +9,6 @@ jobs:
 
   BuildAndTestWithGradle:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     
     steps:
     - uses: actions/checkout@v4
@@ -35,7 +32,8 @@ jobs:
   CreatePullRequest:
     needs: BuildAndTestWithGradle
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      pull-requests: write
     
     steps:
       - name: Checkout code
