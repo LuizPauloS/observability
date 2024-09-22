@@ -2,8 +2,10 @@ package br.com.lsilva.portfolio.observability.resources;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,21 +27,30 @@ public class UsersResources {
 
     Logger log = LoggerFactory.getLogger(UsersResources.class);
     
-    @Autowired
-    private UsersServices service;
 
-    @PostMapping
-    public ResponseEntity<UserDTO> saveUser(@RequestBody UserDTO userDTO) {
+    private final UsersServices service;
+
+    public UsersResources(UsersServices service) {
+        this.service = service;
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserDTO> saveUser(@RequestBody @Validated UserDTO userDTO) {
         return ResponseEntity.ok(service.addUser(userDTO));
     }
 
-    @GetMapping("/{uuid}")
-    public  ResponseEntity<UserDTO> findByUUID(@PathVariable Integer id) throws Exception {
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public  ResponseEntity<UserDTO> findByUUID(@PathVariable Integer id) {
         return ResponseEntity.ok(service.findByUUID(id));
     }
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserDTO>> listAll() {
         return ResponseEntity.ok(service.listAll());
+    }
+
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> deleteUser(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.deleteUser(id));
     }
 }
