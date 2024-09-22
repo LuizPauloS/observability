@@ -1,13 +1,13 @@
-// package br.com.lsilva.portfolio.observability;
+package br.com.lsilva.portfolio.observability;
 
-// import org.junit.jupiter.api.Test;
-// import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
-// @SpringBootTest
-// class ObservabilityApplicationTests {
+@SpringBootTest
+class ObservabilityApplicationTests {
 
-// 	@Test
-// 	void contextLoads() {
-// 	}
+	// @Test
+	// void contextLoads() {
+	// }
 
-// }
+}
